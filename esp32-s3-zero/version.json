@@ -1,0 +1,7 @@
+{
+    "version": "4.3.1-UNIVERSAL-UA",
+    "channel": "esp32-s3-zero",
+    "url": "https://raw.githubusercontent.com/maksbit/smartgen-releases/refs/heads/main/esp32-s3-zero/firmware.bin",
+    "sha256": "9c036e0c464359c8686f937ac69820c4db10cc7dd185251e1d9fcf94fe825be8",
+    "size": 1296480
+}

@@ -1,0 +1,7 @@
+{
+    "version": "4.3.1-UNIVERSAL-UA",
+    "channel": "esp32-s3-w5500",
+    "url": "https://raw.githubusercontent.com/maksbit/smartgen-releases/refs/heads/main/esp32-s3-w5500/firmware.bin",
+    "sha256": "81b936a58e1b5b418c9b1fb48b64abdd9dacbe6cae57155c33f36b10b7324e75",
+    "size": 1393728
+}
