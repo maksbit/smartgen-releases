@@ -1,0 +1,73 @@
+name: Import SmartGen OTA package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-smartgen-ota.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release repository
+        uses: actions/checkout@v4
+
+      - name: Download validated SmartGen artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-0ed4-81f4-b5a0-fc84ad1e00f9/raw?se=2026-09-11T07%3A14%3A28Z&sp=r&sv=2026-02-06&sr=b&scid=99181cf5-8f47-5471-b145-92f975fdcb6f&skoid=40ce4b34-a373-4a62-b0bf-44befe221915&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-11T06%3A10%3A36Z&ske=2026-09-12T06%3A10%3A36Z&sks=b&skv=2026-02-06&sig=R4vEM1AL6HprZtSanEYM3bjSZnIG9LwSlYEAcfvnLYM%3D' -o smartgen-ota.zip
+          rm -rf imported
+          mkdir imported
+          unzip -q smartgen-ota.zip -d imported
+
+      - name: Publish OTA channels
+        shell: bash
+        run: |
+          set -euo pipefail
+          for channel in wt32-eth01 esp32-s3-w5500 esp32-s3-w5500-8mb ts2137y-s3-zero esp32-s3-zero; do
+            mkdir -p "$channel"
+            cp "imported/releases/$channel/firmware.bin" "$channel/firmware.bin"
+            cp "imported/releases/$channel/version.json" "$channel/version.json"
+          done
+
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+
+          for d in [
+              "wt32-eth01",
+              "esp32-s3-w5500",
+              "esp32-s3-w5500-8mb",
+              "ts2137y-s3-zero",
+              "esp32-s3-zero",
+          ]:
+              p = Path(d)
+              data = (p / "firmware.bin").read_bytes()
+              m = json.loads((p / "version.json").read_text())
+              digest = hashlib.sha256(data).hexdigest()
+              assert m["version"] == "4.3.1-UNIVERSAL-UA", (d, m["version"])
+              assert m["channel"] == d, (d, m["channel"])
+              assert m["sha256"] == digest, (d, m["sha256"], digest)
+              assert m["size"] == len(data), (d, m["size"], len(data))
+              print(d, len(data), digest)
+          PY
+
+      - name: Commit OTA release
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf imported smartgen-ota.zip
+          git config user.name "SmartGen OTA Publisher"
+          git config user.email "actions@users.noreply.github.com"
+          git add wt32-eth01 esp32-s3-w5500 esp32-s3-w5500-8mb ts2137y-s3-zero esp32-s3-zero
+          if git diff --cached --quiet; then
+            echo "No release changes."
+            exit 0
+          fi
+          git commit -m "Publish SmartGen 4.3.1 OTA"
+          git push origin main
