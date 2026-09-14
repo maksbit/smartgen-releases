@@ -1,7 +1,7 @@
 {
-    "version": "4.3.1-UNIVERSAL-UA",
+    "version": "4.3.2-UNIVERSAL-UA",
     "channel": "ts2137y-s3-zero",
     "url": "https://raw.githubusercontent.com/maksbit/smartgen-releases/refs/heads/main/ts2137y-s3-zero/firmware.bin",
-    "sha256": "9c036e0c464359c8686f937ac69820c4db10cc7dd185251e1d9fcf94fe825be8",
-    "size": 1296480
+    "sha256": "b0a4db4e18dfd93bb2506a443b504cbb1c9926ad86c955d471cf2a33f9850724",
+    "size": 1297632
 }
